@@ -24,6 +24,9 @@ lazy val scalaCalculator = project.in(file("."))
     /* Depend on the scalajs-dom library.
      * It provides static types for the browser DOM APIs.
      */
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.8.1",
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "2.8.1",
+      "com.raquo" %%% "laminar" % "17.0.0"  // Requires recent Scala.js
+    )
   )
 
