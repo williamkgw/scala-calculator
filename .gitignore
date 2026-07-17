@@ -1,0 +1,32 @@
+# Scala.js and SBT build artifacts
+target/
+project/target/
+dist/
+lib_managed/
+src_managed/
+
+# Scala.js specific build servers (if used)
+.bsp/
+.bloop/
+.metals/
+
+# IDE files (IntelliJ/VS Code/Eclipse)
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+.project
+.classpath
+.settings/
+
+# node
+node_modules
+
+# OS and editor specific
+.DS_Store
+*.swp
+*.swo
+.history
+.cache
+.scala_dependencies   
