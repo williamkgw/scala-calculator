@@ -1,41 +1,7 @@
 package scala_calculator
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.*
-import com.raquo.laminar.api.L.{*, given}
-
 import org.scalajs.dom
-
-object UICalculator {
-  def render(buttons: Seq[Seq[String]]): HtmlElement =
-    table(
-      UIDisplay.render(),
-      UIButtons.render(buttons)
-    )
-}
-
-object UIDisplay {
-  def render(): HtmlElement =
-    tr(
-      td(
-        colSpan := 3,
-        input(value := "", readOnly := true),
-      )
-    )
-}
-
-object UIButtons {
-  def render(buttons: Seq[Seq[String]]): Seq[HtmlElement] =
-    buttons.map { row =>
-      tr(
-        row.map { label =>
-          td(
-            button(label)
-          )
-        }
-      )
-    }
-}
+import com.raquo.laminar.api.L.{renderOnDomContentLoaded}
 
 object App {
   def main(args: Array[String]): Unit =
