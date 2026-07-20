@@ -6,13 +6,15 @@ import com.raquo.laminar.api.L.{renderOnDomContentLoaded}
 object App {
   def main(args: Array[String]): Unit =
     val buttons = Seq(
-      Seq("1", "2", "3"),
-      Seq("4", "5", "6"),
-      Seq("7", "0", "9"),
+      Seq("(", "DEL", ")", "/"),
+      Seq("1", "2", "3", "X"),
+      Seq("4", "5", "6", "-"),
+      Seq("7", "8", "9", "+"),
+      Seq("ON", "0", ",", "="),
     )
 
     lazy val appContainer = dom.document.querySelector("#app")
-    val appElement = UICalculator.render(buttons)
+    val appElement = UICalculator(buttons).render()
     renderOnDomContentLoaded(appContainer, appElement)
 }
 

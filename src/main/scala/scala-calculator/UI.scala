@@ -2,34 +2,47 @@ package scala_calculator
 
 import com.raquo.laminar.api.L.{*, given}
 
-object UICalculator {
-  def render(buttons: Seq[Seq[String]]): HtmlElement =
-    table(
-      UIDisplay.render(),
-      UIButtons.render(buttons)
-    )
+trait Rendable {
+  def render(): HtmlElement | Seq[HtmlElement]
 }
 
-object UIDisplay {
-  def render(): HtmlElement =
+
+class UIButton(buttonText: String) extends Rendable {
+  override def render(): HtmlElement =
+    button(buttonText)
+}
+
+
+class UIDisplay extends Rendable {
+  override def render(): HtmlElement =
     tr(
       td(
-        colSpan := 3,
+        colSpan := 4,
         input(value := "", readOnly := true),
       )
     )
 }
 
-object UIButtons {
-  def render(buttons: Seq[Seq[String]]): Seq[HtmlElement] =
+
+class UIButtons(buttons: Seq[Seq[String]]) extends Rendable {
+  override def render(): Seq[HtmlElement] =
     buttons.map { row =>
       tr(
         row.map { label =>
           td(
-            button(label)
+            UIButton(label).render()
           )
         }
       )
     }
+}
+
+
+class UICalculator(buttons: Seq[Seq[String]]) extends Rendable {
+  override def render(): HtmlElement =
+    table(
+      UIDisplay().render(),
+      UIButtons(buttons).render()
+    )
 }
 
