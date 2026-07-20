@@ -6,42 +6,47 @@ import com.raquo.laminar.api.L.{*, given}
 
 import org.scalajs.dom
 
-@main
-def ScalaCalculator(): Unit =
-  renderOnDomContentLoaded(
-    dom.document.getElementById("app"),
-    Main.appElement()
-  )
-
-// import javascriptLogo from "/javascript.svg"
-@js.native @JSImport("/javascript.svg", JSImport.Default)
-val javascriptLogo: String = js.native
-
-object Main:
-  def appElement(): Element =
-    div(
-      a(href := "https://vitejs.dev", target := "_blank",
-        img(src:= "/vite.svg", className := "logo", alt :="Vite logo")
-      ),
-      a(href := "https://developer.mozilla.org/en-US/docs/Web/JavaScript", target := "_blank"
-        img(src := javascriptLogo, className :="logo vanilla", alt := "JavaScript logo")
-      ),
-      h1("Scala Calculator"),
-      div(className := "card",
-        button(id := "counter", typeName := "button")
-      ),
-      p(className := "read-the-docs", "Click on the Vite logo to learn more")
+object UICalculator {
+  def render(buttons: Seq[Seq[String]]): HtmlElement =
+    table(
+      UIDisplay.render(),
+      UIButtons.render(buttons)
     )
-  end appElement
-end Main
+}
 
-def counterButton(): Element =
-  val counter = Var(0)
-  button(
-    tpe := "button",
-    "count is ",
-    child.text <-- counter,
-    onClick --> { event => counter.update(c => c + 1) },
-  )
-end counterButton
+object UIDisplay {
+  def render(): HtmlElement =
+    tr(
+      td(
+        colSpan := 3,
+        input(value := "", readOnly := true),
+      )
+    )
+}
+
+object UIButtons {
+  def render(buttons: Seq[Seq[String]]): Seq[HtmlElement] =
+    buttons.map { row =>
+      tr(
+        row.map { label =>
+          td(
+            button(label)
+          )
+        }
+      )
+    }
+}
+
+object App {
+  def main(args: Array[String]): Unit =
+    val buttons = Seq(
+      Seq("1", "2", "3"),
+      Seq("4", "5", "6"),
+      Seq("7", "0", "9"),
+    )
+
+    lazy val appContainer = dom.document.querySelector("#app")
+    val appElement = UICalculator.render(buttons)
+    renderOnDomContentLoaded(appContainer, appElement)
+}
 
