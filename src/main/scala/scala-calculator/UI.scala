@@ -7,30 +7,73 @@ trait Rendable {
 }
 
 
-class UIButton(buttonText: String) extends Rendable {
+class UIButton(buttonText: String, eventButton: EventBus[String]) extends Rendable {
   override def render(): HtmlElement =
-    button(buttonText)
+    button(
+      buttonText,
+      onClick.map { _ =>
+        buttonText
+      } --> eventButton
+    )
 }
 
 
-class UIDisplay extends Rendable {
+class UIDisplay(eventButton: EventBus[String]) extends Rendable {
+  import ExpressionOperations.*
+
+  def TreatDisplayText(displayText: Signal[String]) =
+    //
+    // (((1 + 2) + 3) + ((10 + 20) + 30))
+    //
+    // val inOp = Operation(
+    //   Operation(Operation(Value(1), Value(2), Sum), Value(3), Sum),
+    //   Operation(Operation(Value(10), Value(20), Sum), Value(30), Sum),
+    //   Sum
+    // )
+    //
+    val expr =
+      Operation(
+        Operation(
+          Value(1),
+          Operation(Value(2), Value(3), Sum),
+          Sum
+        ),
+        Operation(
+          Operation(
+            Value(10),
+            Operation(Value(20), Value(30), Sum),
+            Sum
+          ),
+          Value(0),
+          Sum
+        ),
+        Sum
+      )
+
+    val exprResult = expr.process()
+
+    displayText.map {
+      a => s"$exprResult"
+    }
+
   override def render(): HtmlElement =
+    val displayText = TreatDisplayText(eventButton.events.scanLeft("")(_ + _))
     tr(
       td(
         colSpan := 4,
-        input(value := "", readOnly := true),
+        input(value <-- displayText, readOnly := true),
       )
     )
 }
 
 
-class UIButtons(buttons: Seq[Seq[String]]) extends Rendable {
+class UIButtons(buttons: Seq[Seq[String]], eventButton: EventBus[String]) extends Rendable {
   override def render(): Seq[HtmlElement] =
     buttons.map { row =>
       tr(
         row.map { label =>
           td(
-            UIButton(label).render()
+            UIButton(label, eventButton).render()
           )
         }
       )
@@ -40,9 +83,11 @@ class UIButtons(buttons: Seq[Seq[String]]) extends Rendable {
 
 class UICalculator(buttons: Seq[Seq[String]]) extends Rendable {
   override def render(): HtmlElement =
+    val eventButton: EventBus[String] = new EventBus[String]
+
     table(
-      UIDisplay().render(),
-      UIButtons(buttons).render()
+      UIDisplay(eventButton).render(),
+      UIButtons(buttons, eventButton).render()
     )
 }
 
