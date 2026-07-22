@@ -11,15 +11,6 @@ case class Value(value: Int) extends Expression {
   def process() = value
 }
 
-//
-// (((1 + 2) + 3) + ((10 + 20) + 30))
-//
-// val inOp = Operation(
-//   Operation(Operation(Value(1), Value(2), Sum), Value(3), Sum),
-//   Operation(Operation(Value(10), Value(20), Sum), Value(30), Sum),
-//   Sum
-// )
-//
 case class Operation(
   left: Expression,
   right: Expression,

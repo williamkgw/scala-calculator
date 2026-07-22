@@ -2,6 +2,29 @@ package scala_calculator
 
 import com.raquo.laminar.api.L.{*, given}
 
+// Calculator expression compiler design
+//
+//
+// String
+// |
+// |
+// Tokenizer
+// |
+// |
+// List[Token]
+// |
+// |
+// Parser
+// |
+// |
+// Expression (AST)
+// |
+// |
+// process()
+// |
+// |
+// Int
+
 trait Rendable {
   def render(): HtmlElement | Seq[HtmlElement]
 }
@@ -22,15 +45,11 @@ class UIDisplay(eventButton: EventBus[String]) extends Rendable {
   import ExpressionOperations.*
 
   def TreatDisplayText(displayText: Signal[String]) =
-    //
-    // (((1 + 2) + 3) + ((10 + 20) + 30))
-    //
-    // val inOp = Operation(
-    //   Operation(Operation(Value(1), Value(2), Sum), Value(3), Sum),
-    //   Operation(Operation(Value(10), Value(20), Sum), Value(30), Sum),
-    //   Sum
-    // )
-    //
+    val expression = "1 + 2 + 3 + 10 + 20 + 30"
+    // example of Tokenizer
+    val tokens = Tokenizer.tokenize(expression)
+
+    // output of display text expression
     val expr =
       Operation(
         Operation(
@@ -53,7 +72,7 @@ class UIDisplay(eventButton: EventBus[String]) extends Rendable {
     val exprResult = expr.process()
 
     displayText.map {
-      a => s"$exprResult"
+      a => s"$exprResult $tokens"
     }
 
   override def render(): HtmlElement =
