@@ -75,24 +75,33 @@ object AbstractSyntaxTreeParser {
   def parseExpression(exp: List[Token] ): (Tree, List[Token]) =
     val (left, rest) = parseTerm(exp)
 
-    rest match {
-      case (op @ Operator(Sum | Sub)) :: tail =>
-        val (right, remaining) = parseExpression(tail)
-        (Branch(op, left, right), remaining)
-      case _ =>
-        (left, rest)
-    }
+    def loopExpression(acc: Tree, exp: List[Token]): (Tree, List[Token]) =
+      exp match {
+        case (op @ Operator(Sum | Sub)) :: tail =>
+          val (right, remaining) = parseTerm(tail)
+          val newAcc = Branch(op, acc, right)
+          loopExpression(newAcc, remaining)
+        case _ =>
+          (acc, exp)
+      }
+
+    loopExpression(left, rest)
 
   def parseTerm(exp: List[Token]): (Tree, List[Token]) =
     val (left, rest) = parseFactor(exp)
 
-    rest match {
-      case (op @ Operator(Mult | Div)) :: tail =>
-        val (right, remaining) = parseTerm(tail)
-        (Branch(op, left, right), remaining)
-      case _ =>
-        (left, rest)
-    }
+    def loopTerm(acc: Tree, exp: List[Token]): (Tree, List[Token]) =
+      exp match {
+        case (op @ Operator(Mult | Div)) :: tail =>
+          val (right, remaining) = parseFactor(tail)
+          val newAcc = Branch(op, acc, right)
+          loopTerm(newAcc, remaining)
+
+        case _ =>
+          (acc, exp)
+      }
+
+    loopTerm(left, rest)
 
   def parseFactor(exp: List[Token]): (Tree, List[Token]) =
     exp match {
@@ -110,6 +119,28 @@ object AbstractSyntaxTreeParser {
 
       case _ =>
         throw new IllegalArgumentException("Expected a factor")
+    }
+}
+
+object Evaluator {
+  def calculate(middle: Token, left: Int, right: Int): Int =
+    middle match {
+      case Operator(Mult) => left * right
+      case Operator(Div) => left / right
+      case Operator(Sum) => left + right
+      case Operator(Sub) => left - right
+      case x => throw new IllegalArgumentException(s"Expected Operator(Mult | Div | Sum | Sub) received: $x")
+    }
+
+  def evaluate(ast: Tree): (Int) =
+    ast match {
+      case Branch(middle, left, right) =>
+        val evaluateLeft = evaluate(left)
+        val evaluateRight = evaluate(right)
+        calculate(middle, evaluateLeft, evaluateRight)
+
+      case Leaf(Number(n)) =>
+        n
     }
 }
 

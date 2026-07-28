@@ -21,17 +21,16 @@ class UIButton(buttonText: String, eventButton: EventBus[String]) extends Rendab
 class UIDisplay(eventButton: EventBus[String]) extends Rendable {
   import ExpressionOperations.*
 
-  def TreatDisplayText(displayText: Signal[String]) =
-    val expression = "1 + 2 + 3 + 10 + 20 + 30"
-    val tokens = Tokenizer.tokenize(expression)
-    val (tree, rest) = AbstractSyntaxTreeParser.parseExpression(tokens)
-
+  def calculateDisplayText(displayText: Signal[String]) =
     displayText.map {
-      a => s"$tree / $tokens"
+      text =>
+        val tokens = Tokenizer.tokenize(text)
+        val (tree, rest) = AbstractSyntaxTreeParser.parseExpression(tokens)
+        Evaluator.evaluate(tree).toString
     }
 
   override def render(): HtmlElement =
-    val displayText = TreatDisplayText(eventButton.events.scanLeft("")(_ + _))
+    val displayText = eventButton.events.scanLeft("")(_ + _)
     tr(
       td(
         colSpan := 4,
